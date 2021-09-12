@@ -7,12 +7,17 @@ playerImg.src='assets/images/truck.png';
 const coinImg=new Image();
 coinImg.src='assets/images/coin.png';
 
+const bombImg=new Image();
+bombImg.src='assets/images/bomb.png';
+
 
 const scale = 4;
 let position = 0;
-let speed=0.5;
+let speed=1;
 let dy=0;
-let rotation=(0* Math.PI)/180;
+let coinPosition=20;
+let bombPosition=-300;
+let balance=0;
 
 canvas.height = canvas.height * scale;
 canvas.width = canvas.width * scale;
@@ -20,6 +25,10 @@ canvas.width = canvas.width * scale;
 let land = [];
 
 let player={x:200,y:null,width:100,height:75};
+
+let coin={x:null,y:null,width:50,height:50};
+
+let bomb={x:null,y:null,width:50,height:80};
 
 /*Adding EventListener*/
 document.addEventListener("keydown", moveTruck);
@@ -59,24 +68,110 @@ function drawPlayer(dy){
     let y=(canvas.height- player.height-dy) - createWave(position +player.x) * 0.7;
     player.y=y;
     context.save();
-    // context.translate(player.x,player.y);
-    // context.rotate(rotation);
     context.drawImage(playerImg,player.x-offsetX,player.y, player.width,player.height);
     context.restore();
 }
 
-function drawCoin(){
+function drawCoin(coinPosition){
+    coin.x=(canvas.width-coinPosition);
+    let y=(canvas.height- coin.height) - createWave(position +coin.x) * 0.7;
+    coin.y=y;
+    context.drawImage(coinImg,coin.x,coin.y,coin.width,coin.height);
    
-    player.y=player.y+dy;
+}
+
+function drawBomb(bombPosition){
+    bomb.x=(canvas.width-bombPosition);
+    let y=(canvas.height- bomb.height) - createWave(position +bomb.x) * 0.7;
+    bomb.y=y;
+    context.drawImage(bombImg,bomb.x,bomb.y,bomb.width,bomb.height);
+}
+
+function drawScore(balance){
+    context.font = "30px Comic Sans MS";
+    context.fillStyle = "white";
+    context.textAlign = "center";
+    context.fillText("Coin: "+balance,60,40);
+
+}
+
+function checkCoinCollision(){
+    let x = player.x - coin.x;
+    let y = player.y - coin.y;
+    let distance= Math.sqrt( x*x + y*y );
+
+    let collisionDistance=(player.width+coin.width)/2;
+    if (distance<=collisionDistance) {
+        return true;  
+    }
+}
+
+function checkBombCollision(){
+    let x = player.x - bomb.x;
+    let y = player.y - bomb.y;
+    let distance= Math.sqrt( x*x + y*y );
+
+    let collisionDistance=(player.width+bomb.width)/2;
+    if (distance<=collisionDistance) {
+        return true;  
+    }
+}
+
+function syncCoinAndBombSpeed(){
+    if(speed==0){
+        coinPosition+=0;
+        bombPosition+=0;
+    }else if(speed==1){
+        coinPosition+=3.5;
+        bombPosition+=3.5;
+    }
+    else if(speed==1.5){
+        coinPosition+=5;
+        bombPosition+=5;
+    }else if(speed==-0.5){
+        coinPosition-=1.5;
+        bombPosition-=1.5;
+    }
+}
+
+function updateCoin(){
+    if(coinPosition>=canvas.width){
+        coinPosition=20;
+        console.log("find")
+    }
+    else if(checkCoinCollision()){
+        coinPosition=20;
+        balance +=1;
+    }
+}
+
+function updateBomb(){
+    if(bombPosition>=canvas.width){
+        bombPosition=-300;
+    }
+    else if(checkBombCollision()){
+        bombPosition=-300;
+    }
+}
+
+
+const interval=setInterval(() => {
+    drawHill(speed);
+    drawPlayer(dy);
+    drawCoin(coinPosition);
+    drawBomb(bombPosition)
+    updateCoin();
+    updateBomb();
+    syncCoinAndBombSpeed();
+    drawScore(balance)
+},10);
+
+function gameOver(){
+
 
 
 }
 
-setInterval(() => {
-    drawHill(speed);
-    drawPlayer(dy);
-    //updatePlayer();
-},10);
 
 /*Key Down*/
 function moveTruck(e) {
@@ -86,21 +181,15 @@ function moveTruck(e) {
     const DOWN_KEY = 40;
 
     if (e.keyCode == UP_KEY) {
-        dy=20;
-        console.log("pressed")
+        dy=100; 
     } else if (e.keyCode == DOWN_KEY) {
         speed=0;
-
-    } else if (e.keyCode == LEFT_KEY) {
-        
+    } else if (e.keyCode == LEFT_KEY) {      
         speed=-0.5;
-
     } else if (e.keyCode == RIGHT_KEY) {
-
-        speed=1.5;
- 
-     
+        speed=1.5;     
     }
+ 
   }
   
 /*Key Up */
@@ -113,15 +202,11 @@ function stopTruck(e) {
     if (e.keyCode == UP_KEY) {
         dy=0;
     } else if (e.keyCode == DOWN_KEY) {
-      
         speed=0;
-    } else if (e.keyCode == LEFT_KEY) {
-      
+    } else if (e.keyCode == LEFT_KEY) {  
         speed=0;
-
     } else if (e.keyCode == RIGHT_KEY) {
-        speed=0.5;
-    
+        speed=1;    
     }
   }
 
