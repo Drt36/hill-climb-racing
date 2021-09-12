@@ -1,5 +1,14 @@
-const canvas = document.getElementById("canvas");
-const context = canvas.getContext("2d");
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+const pauseBtn=document.getElementById('pause-btn');
+const resumeBtn=document.getElementById('resume-btn');
+const quitBtn=document.getElementById('quit-btn');
+const restartBtn=document.getElementById('restart-btn');
+
+const gameOverNode=document.getElementById('game-over');
+const gameScore=document.getElementById('game-score');
+const tryAgainBtn=document.getElementById('tryagain-btn');
 
 const playerImg=new Image();
 playerImg.src='assets/images/truck.png';
@@ -18,6 +27,8 @@ let dy=0;
 let coinPosition=20;
 let bombPosition=-300;
 let balance=0;
+let ispaused=false;
+let isresumed=false;
 
 canvas.height = canvas.height * scale;
 canvas.width = canvas.width * scale;
@@ -28,11 +39,17 @@ let player={x:200,y:null,width:100,height:75};
 
 let coin={x:null,y:null,width:50,height:50};
 
-let bomb={x:null,y:null,width:50,height:80};
+let bomb={x:null,y:null,width:50,height:60};
 
 /*Adding EventListener*/
 document.addEventListener("keydown", moveTruck);
 document.addEventListener("keyup", stopTruck);
+
+pauseBtn.addEventListener('click',pauseGame);
+resumeBtn.addEventListener('click',resumeGame);
+quitBtn.addEventListener('click',quitGame);
+restartBtn.addEventListener('click',restartGame);
+tryAgainBtn.addEventListener('click',tryAgain);
 
 
 function calcAngle(a, b, c) {
@@ -76,8 +93,7 @@ function drawCoin(coinPosition){
     coin.x=(canvas.width-coinPosition);
     let y=(canvas.height- coin.height) - createWave(position +coin.x) * 0.7;
     coin.y=y;
-    context.drawImage(coinImg,coin.x,coin.y,coin.width,coin.height);
-   
+    context.drawImage(coinImg,coin.x,coin.y,coin.width,coin.height); 
 }
 
 function drawBomb(bombPosition){
@@ -100,7 +116,7 @@ function checkCoinCollision(){
     let y = player.y - coin.y;
     let distance= Math.sqrt( x*x + y*y );
 
-    let collisionDistance=(player.width+coin.width)/2;
+    let collisionDistance=(player.width/2+coin.width/2);
     if (distance<=collisionDistance) {
         return true;  
     }
@@ -111,8 +127,9 @@ function checkBombCollision(){
     let y = player.y - bomb.y;
     let distance= Math.sqrt( x*x + y*y );
 
-    let collisionDistance=(player.width+bomb.width)/2;
-    if (distance<=collisionDistance) {
+    let collisionDistanceRight=(player.width/2+bomb.width/2);
+    let collisionDistanceTop=(player.height/2+bomb.height/2);
+    if (distance<=collisionDistanceRight || distance<=collisionDistanceTop) {
         return true;  
     }
 }
@@ -137,7 +154,6 @@ function syncCoinAndBombSpeed(){
 function updateCoin(){
     if(coinPosition>=canvas.width){
         coinPosition=20;
-        console.log("find")
     }
     else if(checkCoinCollision()){
         coinPosition=20;
@@ -150,7 +166,7 @@ function updateBomb(){
         bombPosition=-300;
     }
     else if(checkBombCollision()){
-        bombPosition=-300;
+        gameOver();
     }
 }
 
@@ -163,13 +179,55 @@ const interval=setInterval(() => {
     updateCoin();
     updateBomb();
     syncCoinAndBombSpeed();
-    drawScore(balance)
+    drawScore(balance);
+    updateBtn();
 },10);
 
+function updateBtn(){
+    if(ispaused){
+        pauseBtn.style.display='none';
+        resumeBtn.style.display='inline';
+    }
+
+    if(isresumed){
+        pauseBtn.style.display='inline';
+        resumeBtn.style.display='none';
+    }
+    
+}
+
+function pauseGame(){
+    speed=0; 
+    ispaused=true;
+    isresumed=false;
+}
+
+function resumeGame(){
+    speed=1;  
+    isresumed=true;
+    ispaused=false;
+
+}
+
 function gameOver(){
+    gameScore.innerHTML='Your Score is: '+balance;
+    clearInterval(interval); 
+    gameOverNode.style.display='block';
+}
 
+function tryAgain(){
+    document.location.reload();
+    clearInterval(interval); 
+}
 
+function quitGame(){
+    clearInterval(interval); 
+    window.close();
+}
 
+function restartGame(){
+    document.location.reload();
+    clearInterval(interval); 
 }
 
 

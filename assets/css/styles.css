@@ -2,16 +2,78 @@
     --primary-color: purple;
 }
 
-.header h1 {
+.header h1{
     text-align: center;
     font-family: sans-serif;
     color: var(--primary-color);
 }
-
+h1{
+    text-align: center;
+    font-family: sans-serif;
+    color: white;
+}
+#game-over{
+    margin-left:34vw;
+    margin-right:30vw;
+    padding:0.5rem;
+    top:30vh;
+    border-radius:0.5rem;
+    position: absolute;
+    color: white;
+    display:none;
+    background-color: var(--primary-color);
+}
+.game-over__btn{
+    padding:1rem;
+    border-radius:0.5rem;
+    color: white;
+    font-family: sans-serif;
+    font-weight: bold;
+    margin-left:13vw;
+    border: none;
+}
+.game-over__btn:hover{
+    opacity: 0.9;
+    cursor: pointer;
+}
 #canvas {
     width: 1600px;
-    height: 800px;
+    height: 700px;
     margin-left: 8vw;
     border: 3px solid var(--primary-color);
     transition: 1s linear;
+}
+
+.btn-wrapper{
+    margin-left:38vw;
+}
+
+.btn-wrapper .btn-wrapper__btn{
+    padding:1rem;
+    border-radius:0.5rem;
+    color: white;
+    font-family: sans-serif;
+    font-weight: bold;
+    margin:1rem;
+    border: none;
+}
+.btn-wrapper .btn-wrapper__btn:hover{
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.btn--primary{
+    background-color: var(--primary-color);
+}
+
+.btn--danger{
+    background-color: red;
+}
+
+.btn--success{
+    background-color: green;
+}
+
+#resume-btn{
+    display: none;
 }
