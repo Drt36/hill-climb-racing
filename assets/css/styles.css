@@ -13,4 +13,5 @@
     height: 800px;
     margin-left: 8vw;
     border: 3px solid var(--primary-color);
+    transition: 1s linear;
 }
