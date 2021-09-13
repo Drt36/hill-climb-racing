@@ -1,79 +1,83 @@
 :root {
-    --primary-color: purple;
+    --primary-color: white;
 }
 
-.header h1{
+body {
+    background-image: linear-gradient(315deg, #1a1824 0%, #061f30 74%);
+}
+
+.header h1 {
     text-align: center;
     font-family: sans-serif;
     color: var(--primary-color);
 }
-h1{
-    text-align: center;
-    font-family: sans-serif;
-    color: white;
-}
-#game-over{
-    margin-left:34vw;
-    margin-right:30vw;
-    padding:0.5rem;
-    top:30vh;
-    border-radius:0.5rem;
+
+#game-over {
+    top: 30vh;
+    padding: 1rem;
+    margin-left: 35vw;
+    margin-right: 30vw;
+    border-radius: 0.5rem;
     position: absolute;
-    color: white;
-    display:none;
-    background-color: var(--primary-color);
+    color: var(--primary-color);
+    display: none;
+    background-color: purple;
 }
-.game-over__btn{
-    padding:1rem;
-    border-radius:0.5rem;
-    color: white;
-    font-family: sans-serif;
+
+.game-over__btn {
+    padding: 1rem;
+    margin-left: 11vw;
+    color: var(--primary-color);
     font-weight: bold;
-    margin-left:13vw;
+    border-radius: 0.5rem;
+    font-family: sans-serif;
     border: none;
 }
-.game-over__btn:hover{
+
+.game-over__btn:hover {
     opacity: 0.9;
     cursor: pointer;
 }
+
 #canvas {
     width: 1600px;
     height: 700px;
     margin-left: 8vw;
-    border: 3px solid var(--primary-color);
     transition: 1s linear;
+    border: 3px solid var(--primary-color);
 }
 
-.btn-wrapper{
-    margin-left:38vw;
+.btn-wrapper {
+    margin-left: 42vw;
 }
 
-.btn-wrapper .btn-wrapper__btn{
-    padding:1rem;
-    border-radius:0.5rem;
-    color: white;
-    font-family: sans-serif;
-    font-weight: bold;
-    margin:1rem;
+.btn-wrapper .btn-wrapper__btn {
+    margin: 1rem;
     border: none;
+    padding: 1rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    border-radius: 0.5rem;
+    font-family: sans-serif;
 }
-.btn-wrapper .btn-wrapper__btn:hover{
+
+.btn-wrapper .btn-wrapper__btn:hover {
     opacity: 0.7;
     cursor: pointer;
 }
 
-.btn--primary{
-    background-color: var(--primary-color);
+.btn--primary {
+    background-color: purple;
 }
 
-.btn--danger{
+.btn--danger {
     background-color: red;
 }
 
-.btn--success{
+.btn--success {
     background-color: green;
 }
 
-#resume-btn{
+#resume-btn {
     display: none;
 }

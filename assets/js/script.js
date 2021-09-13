@@ -19,16 +19,26 @@ coinImg.src='assets/images/coin.png';
 const bombImg=new Image();
 bombImg.src='assets/images/bomb.png';
 
+const coinSound=new Audio('assets/music/coin-sound.mp3');
+const gameOverSound=new Audio('assets/music/game-over.mp3');
 
-const scale = 4;
-let position = 0;
-let speed=1;
 let dy=0;
+let speed=1;
+const scale = 4;
+let coinCount=0;
+let position = 0;
 let coinPosition=20;
 let bombPosition=-300;
-let balance=0;
-let ispaused=false;
-let isresumed=false;
+
+let isPaused=false;
+let isResumed=false;
+let isStart=true;
+let animationFrame;
+let resumeAnimation;
+
+let storage=window.localStorage;
+let highCoinCount=storage.getItem('highCoin');
+
 
 canvas.height = canvas.height * scale;
 canvas.width = canvas.width * scale;
@@ -41,29 +51,28 @@ let coin={x:null,y:null,width:50,height:50};
 
 let bomb={x:null,y:null,width:50,height:60};
 
-/*Adding EventListener*/
 document.addEventListener("keydown", moveTruck);
 document.addEventListener("keyup", stopTruck);
 
+quitBtn.addEventListener('click',quitGame);
 pauseBtn.addEventListener('click',pauseGame);
 resumeBtn.addEventListener('click',resumeGame);
-quitBtn.addEventListener('click',quitGame);
-restartBtn.addEventListener('click',restartGame);
 tryAgainBtn.addEventListener('click',tryAgain);
-
+restartBtn.addEventListener('click',restartGame);
 
 function calcAngle(a, b, c) {
-  return a + b + (a - b) * Math.cos(c * Math.PI);
+   return a + b + (a - b) * Math.cos(c * Math.PI);
 }
 
 function createWave(x) {
-   x = x / 200;
+  x = x / 200;
   land.push(Math.random() * 120);
   return calcAngle(land[Math.floor(x)], land[Math.ceil(x)], x - Math.floor(x));
 }
 
 function drawHill(speed) {
   position +=1*speed;
+
   context.fillStyle = "#19f";
   context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -72,9 +81,10 @@ function drawHill(speed) {
   context.moveTo(0, canvas.height);
 
   for (i = 0; i < canvas.width; i++) {
-    y = canvas.height - createWave(position + i) * 0.7;
+    y = canvas.height - createWave(position+i) * 0.7;
     context.lineTo(i, y);
   }
+
   context.lineTo(canvas.width, canvas.height);
   context.fill();
   
@@ -103,12 +113,18 @@ function drawBomb(bombPosition){
     context.drawImage(bombImg,bomb.x,bomb.y,bomb.width,bomb.height);
 }
 
-function drawScore(balance){
+function drawScore(coinCount){
     context.font = "30px Comic Sans MS";
     context.fillStyle = "white";
     context.textAlign = "center";
-    context.fillText("Coin: "+balance,60,40);
+    context.fillText("Coin: "+coinCount,60,40);
+}
 
+function drawHighScore(highCoinCount){
+    context.font = "30px Comic Sans MS";
+    context.fillStyle = "purple";
+    context.textAlign = "center";
+    context.fillText("High Coin: "+highCoinCount,1100,40);
 }
 
 function checkCoinCollision(){
@@ -117,6 +133,7 @@ function checkCoinCollision(){
     let distance= Math.sqrt( x*x + y*y );
 
     let collisionDistance=(player.width/2+coin.width/2);
+
     if (distance<=collisionDistance) {
         return true;  
     }
@@ -129,6 +146,7 @@ function checkBombCollision(){
 
     let collisionDistanceRight=(player.width/2+bomb.width/2);
     let collisionDistanceTop=(player.height/2+bomb.height/2);
+
     if (distance<=collisionDistanceRight || distance<=collisionDistanceTop) {
         return true;  
     }
@@ -156,8 +174,9 @@ function updateCoin(){
         coinPosition=20;
     }
     else if(checkCoinCollision()){
+        coinSound.play();
         coinPosition=20;
-        balance +=1;
+        coinCount +=1;
     }
 }
 
@@ -170,64 +189,71 @@ function updateBomb(){
     }
 }
 
+function updateHighCoinCount(){
+    if(highCoinCount==null || highCoinCount<=coinCount){
+        highCoinCount=coinCount;
+        storage.setItem("highCoin",highCoinCount);
+    }
+}
 
-const interval=setInterval(() => {
+function start(){
     drawHill(speed);
     drawPlayer(dy);
     drawCoin(coinPosition);
     drawBomb(bombPosition)
     updateCoin();
+    updateHighCoinCount();
     updateBomb();
     syncCoinAndBombSpeed();
-    drawScore(balance);
-    updateBtn();
-},10);
-
-function updateBtn(){
-    if(ispaused){
-        pauseBtn.style.display='none';
-        resumeBtn.style.display='inline';
-    }
-
-    if(isresumed){
-        pauseBtn.style.display='inline';
-        resumeBtn.style.display='none';
-    }
-    
+    drawScore(coinCount);
+    drawHighScore(highCoinCount);
+    console.log("refershing");
+    (isStart) && (animationFrame=requestAnimationFrame(start));
 }
+start();
 
 function pauseGame(){
     speed=0; 
-    ispaused=true;
-    isresumed=false;
+    isPaused=true;
+    isResumed=false;
+    pauseBtn.style.display='none';
+    resumeBtn.style.display='inline'; 
+    cancelAnimationFrame(animationFrame); 
 }
 
 function resumeGame(){
     speed=1;  
-    isresumed=true;
-    ispaused=false;
-
+    isResumed=true;
+    isPaused=false;
+    pauseBtn.style.display='inline';
+    resumeBtn.style.display='none';
+    requestAnimationFrame(start);
 }
 
 function gameOver(){
-    gameScore.innerHTML='Your Score is: '+balance;
-    clearInterval(interval); 
+    isResumed=false;
+    isPaused=false;
+    isStart=false;
+    gameOverSound.play();
+    pauseBtn.style.display='none';
+    gameScore.innerHTML='Your Score is: '+coinCount;
     gameOverNode.style.display='block';
 }
 
 function tryAgain(){
     document.location.reload();
-    clearInterval(interval); 
+    cancelAnimationFrame(animationFrame);
+    
 }
 
 function quitGame(){
-    clearInterval(interval); 
+    cancelAnimationFrame(animationFrame);  
     window.close();
 }
 
 function restartGame(){
     document.location.reload();
-    clearInterval(interval); 
+    cancelAnimationFrame(animationFrame);
 }
 
 
