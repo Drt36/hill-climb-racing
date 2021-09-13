@@ -19,6 +19,9 @@ coinImg.src='assets/images/coin.png';
 const bombImg=new Image();
 bombImg.src='assets/images/bomb.png';
 
+const boomImg=new Image();
+boomImg.src='assets/images/boom.png';
+
 const coinSound=new Audio('assets/music/coin-sound.mp3');
 const gameOverSound=new Audio('assets/music/game-over.mp3');
 
@@ -113,6 +116,11 @@ function drawBomb(bombPosition){
     context.drawImage(bombImg,bomb.x,bomb.y,bomb.width,bomb.height);
 }
 
+function drawBombBlast(){
+    context.drawImage(boomImg,player.x,player.y,100,100);
+}
+
+
 function drawScore(coinCount){
     context.font = "30px Comic Sans MS";
     context.fillStyle = "white";
@@ -134,7 +142,7 @@ function checkCoinCollision(){
 
     let collisionDistance=(player.width/2+coin.width/2);
 
-    if (distance<=collisionDistance) {
+    if (distance<collisionDistance) {
         return true;  
     }
 }
@@ -147,7 +155,7 @@ function checkBombCollision(){
     let collisionDistanceRight=(player.width/2+bomb.width/2);
     let collisionDistanceTop=(player.height/2+bomb.height/2);
 
-    if (distance<=collisionDistanceRight || distance<=collisionDistanceTop) {
+    if (distance<collisionDistanceRight|| distance<collisionDistanceTop) {
         return true;  
     }
 }
@@ -234,6 +242,7 @@ function gameOver(){
     isResumed=false;
     isPaused=false;
     isStart=false;
+    drawBombBlast();
     gameOverSound.play();
     pauseBtn.style.display='none';
     gameScore.innerHTML='Your Score is: '+coinCount;
